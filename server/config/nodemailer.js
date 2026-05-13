@@ -1,12 +1,16 @@
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
-    host: 'smtp-relay.brevo.com',
+    host: 'smtp-brevo.com',
     port: 587,
-    secure: false, 
+    secure: false, // Use false for 587
     auth: {
-        user: process.env.SMTP_USER, // Checks .env for SMTP_USER
-        pass: process.env.SMTP_PASS, // Checks .env for SMTP_PASS
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
     },
+    // Adding these two lines helps us debug in the Render Logs
+    logger: true,
+    debug: true 
 });
+
 export default transporter;
