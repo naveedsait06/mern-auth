@@ -16,6 +16,9 @@ export const AppContextProvider = (props) => {
     const getUserData = async () => {
         try {
             const { data } = await axios.get(backendUrl + '/api/user/data');
+            { 
+            withCredentials: true // Add this here!
+        };
             if (data.success) {
                 setUserData(data.userData);
             } else {
@@ -30,6 +33,9 @@ export const AppContextProvider = (props) => {
     const getAuthState = async () => {
         try {
             const { data } = await axios.get(backendUrl + '/api/auth/is-auth');
+            { 
+            withCredentials: true // Add this here!
+        };
             if (data.success) {
                 setIsLoggedin(true);
             }
