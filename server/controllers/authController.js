@@ -6,7 +6,7 @@ import transporter from '../config/nodemailer.js';
 // REGISTER
 export const register = async (req, res) => {
     const { name, email, password } = req.body;
-
+    
     if (!name || !email || !password) {
         return res.json({ success: false, message: 'Missing Details' });
     }
@@ -103,20 +103,24 @@ export const sendVerifyOtp = async (req, res) => {
             from: process.env.SENDER_EMAIL,
             to: user.email,
             subject: 'Account Verification OTP',
-            text: `Your OTP for verifying your account is ${otp}. Use this code to verify your account.`,
+            text: `Your OTP for verifying your account is ${otp}.`,
         };
+        res.json({ success: true, message: 'Verification OTP Sent!' });
 
-        try {
-            await transporter.sendMail(mailOptions);
-            console.log("SUCCESS: Email sent to", user.email);
-            return res.json({ success: true, message: 'Verification OTP Sent!' });
-        } catch (error) {
-            console.log("FAILED: Nodemailer Error ->", error.message);
-            return res.json({ success: false, message: error.message });
-        }
+        // Then try to send the email in the background
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log("NODEMAILER ERROR:", error.message);
+            } else {
+                console.log("EMAIL SENT:", info.response);
+            }
+        });
 
     } catch (error) {
-        res.json({ success: false, message: error.message });
+        // Only send error if headers haven't been sent yet
+        if (!res.headersSent) {
+            res.json({ success: false, message: error.message });
+        }
     }
 }
 
