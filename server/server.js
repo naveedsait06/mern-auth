@@ -11,14 +11,16 @@ const port = process.env.PORT || 4000;
 
 connectDB();
 
+// Add this for production cookie support on Render
+app.set('trust proxy', 1); 
+
 app.use(express.json());
 app.use(cookieParser());
 
-// Robust CORS configuration
 const allowedOrigins = [
     'http://localhost:5173', 
     'https://mern-auth-1-kl59.onrender.com',
-    'https://mern-auth-1-kl59.onrender.com/' // Added version with slash
+    'https://mern-auth-1-kl59.onrender.com/'
 ];
 
 app.use(cors({ 
