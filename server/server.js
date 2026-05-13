@@ -9,28 +9,33 @@ import authRouter from './routes/authRoutes.js';
 const app = express();
 const port = process.env.PORT || 4000;
 
-// Connect to Database
 connectDB();
 
-// 1. Middlewares
 app.use(express.json());
 app.use(cookieParser());
 
-// Update allowedOrigins with your ACTUAL Live Frontend URL from image_2060b3.png
+// Robust CORS configuration
 const allowedOrigins = [
     'http://localhost:5173', 
-    'https://mern-auth-1-kl59.onrender.com' 
+    'https://mern-auth-1-kl59.onrender.com',
+    'https://mern-auth-1-kl59.onrender.com/' // Added version with slash
 ];
 
 app.use(cors({ 
-    origin: allowedOrigins, 
-    credentials: true 
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"]
 })); 
 
-// 2. API Endpoints
 app.get('/', (req, res) => res.send("API Working"));
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 
-// 3. Start Server
 app.listen(port, () => console.log(`Server started on PORT: ${port}`));
