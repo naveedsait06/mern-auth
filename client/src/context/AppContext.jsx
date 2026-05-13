@@ -12,38 +12,38 @@ export const AppContextProvider = (props) => {
     const [isLoggedin, setIsLoggedin] = useState(false);
     const [userData, setUserData] = useState(null);
 
-    // Function to get User Data from Backend
-    const getUserData = async () => {
-        try {
-            const { data } = await axios.get(backendUrl + '/api/user/data');
-            { 
-            withCredentials: true // Add this here!
-        };
-            if (data.success) {
-                setUserData(data.userData);
-            } else {
-                toast.error(data.message);
-            }
-        } catch (error) {
-            toast.error(error.message);
+   // Function to get User Data from Backend
+const getUserData = async () => {
+    try {
+        // Corrected: The object MUST be inside the get() parentheses
+        const { data } = await axios.get(backendUrl + '/api/user/data', { 
+            withCredentials: true 
+        });
+        
+        if (data.success) {
+            setUserData(data.userData);
+        } else {
+            toast.error(data.message);
         }
+    } catch (error) {
+        toast.error(error.message);
     }
-
+}
     // Function to check if user is already authenticated on page load
-    const getAuthState = async () => {
-        try {
-            const { data } = await axios.get(backendUrl + '/api/auth/is-auth');
-            { 
-            withCredentials: true // Add this here!
-        };
-            if (data.success) {
-                setIsLoggedin(true);
-            }
-        } catch (error) {
-            console.log("Auth state error:", error.message);
+   const getAuthState = async () => {
+    try {
+        // Corrected: Added the object as the second argument
+        const { data } = await axios.get(backendUrl + '/api/auth/is-auth', { 
+            withCredentials: true 
+        });
+        
+        if (data.success) {
+            setIsLoggedin(true);
         }
+    } catch (error) {
+        console.log("Auth state error:", error.message);
     }
-
+}
     // Check auth on initial load
     useEffect(() => {
         getAuthState();
