@@ -16,10 +16,10 @@ connectDB();
 app.use(express.json());
 app.use(cookieParser());
 
-// Update allowedOrigins with your new Live Frontend URL
+// Update allowedOrigins with your ACTUAL Live Frontend URL from image_2060b3.png
 const allowedOrigins = [
     'http://localhost:5173', 
-    'https://secure-systems-live.onrender.com'
+    'https://mern-auth-1-kl59.onrender.com' 
 ];
 
 app.use(cors({ 
