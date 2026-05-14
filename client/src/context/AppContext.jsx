@@ -8,7 +8,9 @@ export const AppContextProvider = (props) => {
 
     axios.defaults.withCredentials = true;
 
-   const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+   // This removes any accidental trailing slashes from the environment variable
+    const base = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+    const backendUrl = base.replace(/\/$/, "");
     const [isLoggedin, setIsLoggedin] = useState(false);
     const [userData, setUserData] = useState(null);
 
