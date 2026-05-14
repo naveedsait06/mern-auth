@@ -85,37 +85,48 @@ export const logout = async (req, res) => {
 
 // SEND VERIFY OTP
 export const sendVerifyOtp = async (req, res) => {
-    try {
-        const userId = req.userId;
-        const user = await userModel.findById(userId);
+  try {
+    const userId = req.userId;
 
-        if (user.isAccountVerified) {
-            return res.json({ success: false, message: "Account Already Verified" });
-        }
+    const user = await userModel.findById(userId);
 
-        const otp = String(Math.floor(100000 + Math.random() * 900000));
-        
-        user.verifyOtp = otp; 
-        user.verifyOtpExpireAt = Date.now() + 24 * 60 * 60 * 1000;
-        await user.save();
-
-        // Send the response to the frontend immediately so the UI updates
-        res.json({ success: true, message: 'Verification OTP Sent!' });
-
-        // Call the new API-based sendEmail function
-        try {
-            await sendEmail(user.email, 'Account Verification OTP', otp);
-            console.log(`Email successfully sent to ${user.email}`);
-        } catch (mailError) {
-            console.error("BREVO API ERROR:", mailError.message);
-        }
-
-    } catch (error) {
-        if (!res.headersSent) {
-            res.json({ success: false, message: error.message });
-        }
+    if (user.isAccountVerified) {
+      return res.json({
+        success: false,
+        message: "Account Already Verified",
+      });
     }
-}
+
+    const otp = String(
+      Math.floor(100000 + Math.random() * 900000)
+    );
+
+    user.verifyOtp = otp;
+    user.verifyOtpExpireAt =
+      Date.now() + 24 * 60 * 60 * 1000;
+
+    await user.save();
+
+    // Send email FIRST
+    await sendEmail(
+      user.email,
+      "Account Verification OTP",
+      otp
+    );
+
+    return res.json({
+      success: true,
+      message: "Verification OTP Sent!",
+    });
+
+  } catch (error) {
+    console.log(error);
+    return res.json({
+      success: false,
+      message: "Failed to send OTP email",
+    });
+  }
+};
 
 // VERIFY EMAIL
 export const verifyEmail = async (req, res) => {
