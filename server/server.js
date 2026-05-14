@@ -17,7 +17,10 @@ app.set('trust proxy', 1);
 app.use(express.json());
 app.use(cookieParser());
 
-const allowedOrigins = ['https://mern-auth-1-kl59.onrender.com'];
+const allowedOrigins = [
+  'https://mern-auth-1-kl59.onrender.com',
+  'http://localhost:5173'
+];
 
 
 app.use(cors({ 
