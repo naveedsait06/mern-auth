@@ -1,7 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import userModel from '../models/userModel.js';
-import transporter from '../config/nodemailer.js';
 import { sendEmail } from '../config/nodemailer.js';
 
 // REGISTER
@@ -100,25 +99,18 @@ export const sendVerifyOtp = async (req, res) => {
         user.verifyOtpExpireAt = Date.now() + 24 * 60 * 60 * 1000;
         await user.save();
 
-        const mailOptions = {
-            from: process.env.SENDER_EMAIL,
-            to: user.email,
-            subject: 'Account Verification OTP',
-            text: `Your OTP for verifying your account is ${otp}.`,
-        };
+        // Send the response to the frontend immediately so the UI updates
         res.json({ success: true, message: 'Verification OTP Sent!' });
 
-        // Then try to send the email in the background
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.log("NODEMAILER ERROR:", error.message);
-            } else {
-                console.log("EMAIL SENT:", info.response);
-            }
-        });
+        // Call the new API-based sendEmail function
+        try {
+            await sendEmail(user.email, 'Account Verification OTP', otp);
+            console.log(`Email successfully sent to ${user.email}`);
+        } catch (mailError) {
+            console.error("BREVO API ERROR:", mailError.message);
+        }
 
     } catch (error) {
-        // Only send error if headers haven't been sent yet
         if (!res.headersSent) {
             res.json({ success: false, message: error.message });
         }
