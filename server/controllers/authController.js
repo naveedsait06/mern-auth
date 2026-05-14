@@ -163,6 +163,7 @@ export const isAuthenticated = async (req, res) => {
 }
 
 // SEND PASSWORD RESET OTP
+// SEND PASSWORD RESET OTP
 export const sendResetOtp = async (req, res) => {
     const { email } = req.body;
 
@@ -179,18 +180,12 @@ export const sendResetOtp = async (req, res) => {
         const otp = String(Math.floor(100000 + Math.random() * 900000));
 
         user.resetOtp = otp;
-        user.resetOtpExpireAt = Date.now() + 15 * 60 * 1000; // 15 Minutes expiry
+        user.resetOtpExpireAt = Date.now() + 15 * 60 * 1000; 
 
         await user.save();
 
-        const mailOptions = {
-            from: process.env.SENDER_EMAIL,
-            to: user.email,
-            subject: 'Password Reset OTP',
-            text: `Your OTP for resetting your password is ${otp}. Use this code to proceed with resetting your password.`,
-        };
-
-        await transporter.sendMail(mailOptions);
+        // Use the new API-based function here
+        await sendEmail(user.email, 'Password Reset OTP', otp);
 
         return res.json({ success: true, message: 'OTP sent to your email' });
 
