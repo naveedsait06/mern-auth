@@ -15,39 +15,6 @@ const EmailVerify = () => {
     getUserData,
   } = useContext(AppContext);
 
-  // Auto send OTP after slight delay (cookie/session settle)
-  useEffect(() => {
-    const sendOtp = async () => {
-      try {
-        if (
-          isLoggedin &&
-          userData &&
-          !userData.isAccountVerified
-        ) {
-          await new Promise((resolve) =>
-            setTimeout(resolve, 1500)
-          );
-
-          const { data } = await axios.post(
-            backendUrl + "/api/auth/send-verify-otp",
-            {},
-            { withCredentials: true }
-          );
-
-          if (data.success) {
-            toast.success("OTP sent to your email");
-          } else {
-            toast.error(data.message);
-          }
-        }
-      } catch (error) {
-        toast.error(error.message);
-      }
-    };
-
-    sendOtp();
-  }, [isLoggedin, userData, backendUrl]);
-
   // Redirect verified users
   useEffect(() => {
     if (
@@ -142,7 +109,7 @@ const EmailVerify = () => {
         </button>
 
         <p className="text-center text-xs text-white/40 mt-6">
-          Please wait a few seconds for OTP delivery.
+          Check your inbox or spam folder for OTP.
         </p>
       </form>
     </div>
