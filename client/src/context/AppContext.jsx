@@ -5,71 +5,75 @@ import { toast } from "react-toastify";
 export const AppContext = createContext();
 
 export const AppContextProvider = (props) => {
+  axios.defaults.withCredentials = true;
 
-    axios.defaults.withCredentials = true;
-
-    const backendUrl =
+  // Backend URL from Vite environment
+  const backendUrl =
     import.meta.env.VITE_BACKEND_URL?.replace(/\/$/, "") || "";
-    console.log("Backend URL:", backendUrl);
-    console.log("Backend URL:", backendUrl);
-    console.log("ENV URL:", base);
-    const [isLoggedin, setIsLoggedin] = useState(false);
-    const [userData, setUserData] = useState(null);
 
-   // Function to get User Data from Backend
-const getUserData = async () => {
+  console.log("Backend URL:", backendUrl);
+
+  const [isLoggedin, setIsLoggedin] = useState(false);
+  const [userData, setUserData] = useState(null);
+
+  // Get user data
+  const getUserData = async () => {
     try {
-        // Corrected: The object MUST be inside the get() parentheses
-        const { data } = await axios.get(backendUrl + '/api/user/data', { 
-            withCredentials: true 
-        });
-        
-        if (data.success) {
-            setUserData(data.userData);
-        } else {
-            toast.error(data.message);
-        }
+      const { data } = await axios.get(
+        backendUrl + "/api/user/data",
+        { withCredentials: true }
+      );
+
+      if (data.success) {
+        setUserData(data.userData);
+      } else {
+        toast.error(data.message);
+      }
     } catch (error) {
-        toast.error(error.message);
+      toast.error(error.message);
     }
-}
-    // Function to check if user is already authenticated on page load
-   const getAuthState = async () => {
+  };
+
+  // Check auth state
+  const getAuthState = async () => {
     try {
-        // Corrected: Added the object as the second argument
-        const { data } = await axios.get(backendUrl + '/api/auth/is-auth', { 
-            withCredentials: true 
-        });
-        
-        if (data.success) {
-            setIsLoggedin(true);
-        }
+      const { data } = await axios.get(
+        backendUrl + "/api/auth/is-auth",
+        { withCredentials: true }
+      );
+
+      if (data.success) {
+        setIsLoggedin(true);
+      }
     } catch (error) {
-        console.log("Auth state error:", error.message);
+      console.log("Auth state error:", error.message);
     }
-}
-    // Check auth on initial load
-    useEffect(() => {
-        getAuthState();
-    }, []);
+  };
 
-    // CRITICAL: Fetch user data automatically whenever isLoggedin becomes true
-    useEffect(() => {
-        if (isLoggedin) {
-            getUserData();
-        }
-    }, [isLoggedin]);
+  // Run once when app loads
+  useEffect(() => {
+    getAuthState();
+  }, []);
 
-    const value = {
-        backendUrl,
-        isLoggedin, setIsLoggedin,
-        userData, setUserData,
-        getUserData
-    };
+  // If logged in, fetch user data
+  useEffect(() => {
+    if (isLoggedin) {
+      getUserData();
+    }
+  }, [isLoggedin]);
 
-    return (
-        <AppContext.Provider value={value}>
-            {props.children}
-        </AppContext.Provider>
-    );
+  const value = {
+    backendUrl,
+    isLoggedin,
+    setIsLoggedin,
+    userData,
+    setUserData,
+    getUserData,
+  };
+
+  return (
+    <AppContext.Provider value={value}>
+      {props.children}
+    </AppContext.Provider>
+  );
 };
