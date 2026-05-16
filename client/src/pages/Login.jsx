@@ -16,17 +16,17 @@ const Login = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false); // Multi-click prevention state
+  const [isLoading, setIsLoading] = useState(false); 
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    if (isLoading) return; // Exit immediately if an API call is already running
+    if (isLoading) return; 
     setIsLoading(true);
 
     try {
       axios.defaults.withCredentials = true;
 
-      // SIGN UP
+      // SIGN UP FLOW
       if (state === "Sign Up") {
         const { data } = await axios.post(
           backendUrl + "/api/auth/register",
@@ -34,17 +34,18 @@ const Login = () => {
         );
 
         if (data.success) {
+          // Set login state true so the application layer knows a session started
           setIsLoggedin(true);
-          await getUserData();
-
-          toast.success(data.message);
+          
+          // Clear double toast notifications with a clean message
+          toast.success("OTP sent successfully!"); 
           navigate("/email-verify");
         } else {
           toast.error(data.message);
         }
       }
 
-      // LOGIN
+      // LOGIN FLOW
       else {
         const { data } = await axios.post(
           backendUrl + "/api/auth/login",
@@ -53,7 +54,7 @@ const Login = () => {
 
         if (data.success) {
           setIsLoggedin(true);
-          await getUserData();
+          await getUserData(); 
 
           toast.success(data.message);
 
@@ -69,7 +70,7 @@ const Login = () => {
     } catch (error) {
       toast.error(error.message);
     } finally {
-      setIsLoading(false); // Always re-enable the form when done
+      setIsLoading(false); 
     }
   };
 
