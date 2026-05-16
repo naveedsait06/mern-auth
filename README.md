@@ -1,7 +1,7 @@
 # 🛡️ Secure Systems - MERN Auth
 
 A professional, full-stack authentication architecture built with **MongoDB, Express, React, and Node.js**.
-🔴 [Click Here to View the Live Project](https://your-live-link-here.com)
+🔴 [Click Here to View the Live Project](https://mern-auth-1-kl59.onrender.com)
 
 ## 📖 About the Project
 
