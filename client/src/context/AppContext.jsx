@@ -7,8 +7,11 @@ export const AppContext = createContext();
 export const AppContextProvider = (props) => {
     axios.defaults.withCredentials = true;
 
-    const base = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
-    const backendUrl = base.replace(/\/$/, ""); 
+    // Automatically switches to your clean frontend proxy URL in production
+    const isProduction = import.meta.env.PROD;
+    const backendUrl = isProduction 
+    ? "https://mern-auth-1-kl59.onrender.com" 
+    : "http://localhost:4000";
     
     const [isLoggedin, setIsLoggedin] = useState(false);
     const [userData, setUserData] = useState(null);
