@@ -16,9 +16,12 @@ const Login = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // Multi-click prevention state
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
+    if (isLoading) return; // Exit immediately if an API call is already running
+    setIsLoading(true);
 
     try {
       axios.defaults.withCredentials = true;
@@ -65,6 +68,8 @@ const Login = () => {
       }
     } catch (error) {
       toast.error(error.message);
+    } finally {
+      setIsLoading(false); // Always re-enable the form when done
     }
   };
 
@@ -86,53 +91,63 @@ const Login = () => {
 
           {state === "Sign Up" && (
             <div className="flex items-center gap-3 bg-white/5 px-5 py-4 rounded-2xl">
-              <img src={assets.person_icon} className="w-5" />
+              <img src={assets.person_icon} className="w-5" alt="user icon" />
               <input
                 type="text"
                 placeholder="Full Name"
                 required
                 value={name}
+                disabled={isLoading}
                 onChange={(e) => setName(e.target.value)}
-                className="bg-transparent outline-none w-full text-white"
+                className="bg-transparent outline-none w-full text-white disabled:opacity-50"
               />
             </div>
           )}
 
           <div className="flex items-center gap-3 bg-white/5 px-5 py-4 rounded-2xl">
-            <img src={assets.mail_icon} className="w-5" />
+            <img src={assets.mail_icon} className="w-5" alt="email icon" />
             <input
               type="email"
               placeholder="Email Address"
               required
               value={email}
+              disabled={isLoading}
               onChange={(e) => setEmail(e.target.value)}
-              className="bg-transparent outline-none w-full text-white"
+              className="bg-transparent outline-none w-full text-white disabled:opacity-50"
             />
           </div>
 
           <div className="flex items-center gap-3 bg-white/5 px-5 py-4 rounded-2xl">
-            <img src={assets.lock_icon} className="w-5" />
+            <img src={assets.lock_icon} className="w-5" alt="password icon" />
             <input
               type="password"
               placeholder="Password"
               required
               value={password}
+              disabled={isLoading}
               onChange={(e) => setPassword(e.target.value)}
-              className="bg-transparent outline-none w-full text-white"
+              className="bg-transparent outline-none w-full text-white disabled:opacity-50"
             />
           </div>
 
           {state === "Login" && (
             <p
-              onClick={() => navigate("/reset-password")}
-              className="text-xs text-blue-400 text-right cursor-pointer"
+              onClick={() => !isLoading && navigate("/reset-password")}
+              className={`text-xs text-blue-400 text-right ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
             >
               Forgot password?
             </p>
           )}
 
-          <button className="mt-4 w-full py-4 bg-white text-black font-bold rounded-2xl hover:bg-blue-600 hover:text-white transition">
-            {state === "Sign Up" ? "SIGN UP" : "LOGIN"}
+          <button 
+            disabled={isLoading}
+            className={`mt-4 w-full py-4 bg-white text-black font-bold rounded-2xl transition ${
+              isLoading 
+                ? 'opacity-50 cursor-not-allowed' 
+                : 'hover:bg-blue-600 hover:text-white'
+            }`}
+          >
+            {isLoading ? "PROCESSING..." : (state === "Sign Up" ? "SIGN UP" : "LOGIN")}
           </button>
         </form>
 
@@ -143,9 +158,9 @@ const Login = () => {
 
           <span
             onClick={() =>
-              setState(state === "Sign Up" ? "Login" : "Sign Up")
+              !isLoading && setState(state === "Sign Up" ? "Login" : "Sign Up")
             }
-            className="text-blue-500 ml-2 cursor-pointer"
+            className={`text-blue-500 ml-2 ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
           >
             {state === "Sign Up" ? "Login" : "Sign Up"}
           </span>
